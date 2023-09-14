@@ -2,14 +2,14 @@ name: Send message to Telegram
 
 on:
   workflow_call:
-    secrets:
-      TELEGRAM_CHAT_ID:
-        required: true
-      TELEGRAM_BOT_KEY:
-        required: true
     inputs:
-      ENVIRONMENT:
+      env-name:
         type: string
+        required: true
+    secrets:
+      telegram-chat-id:
+        required: true
+      telegram-bot-key:
         required: true
 
 jobs:
@@ -20,9 +20,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Post to Telegram
         run: |
-          message="[${{ inputs.ENVIRONMENT }}] ${{ github.event.repository.name }} - '$(git log -1 --pretty=%B | cat | head -n 1)'"
+          message="[${{ inputs.env-name }}] ${{ github.event.repository.name }} - '$(git log -1 --pretty=%B | cat | head -n 1)'"
           curl --request POST \
-              --url "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_KEY }}/sendMessage" \
+              --url "https://api.telegram.org/bot${{ secrets.telegram-bot-key }}/sendMessage" \
               --header 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)' \
               --header 'accept: application/json' \
               --header 'content-type: application/json' \
@@ -32,5 +32,5 @@ jobs:
             \"disable_notification\": false,
             \"reply_to_message_id\": null,
             \"parse_mode\": \"Markdown\",
-            \"chat_id\": ${{ secrets.TELEGRAM_CHAT_ID }}
+            \"chat_id\": ${{ secrets.telegram-chat-id }}
           }"
